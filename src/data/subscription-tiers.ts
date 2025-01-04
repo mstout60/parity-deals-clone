@@ -1,7 +1,7 @@
-//import { env } from "./env/server"
+import { env } from "./env/server";
 
-export type TierNames = keyof typeof subscriptionTiers
-export type PaidTierNames = Exclude<TierNames, "Free">
+export type TierNames = keyof typeof subscriptionTiers;
+export type PaidTierNames = Exclude<TierNames, "Free">;
 
 export const subscriptionTiers = {
   Free: {
@@ -12,7 +12,6 @@ export const subscriptionTiers = {
     canAccessAnalytics: false,
     canCustomizeBanner: false,
     canRemoveBranding: false,
-
   },
   Basic: {
     name: "Basic",
@@ -22,7 +21,6 @@ export const subscriptionTiers = {
     canAccessAnalytics: true,
     canCustomizeBanner: false,
     canRemoveBranding: true,
-
   },
   Standard: {
     name: "Standard",
@@ -32,7 +30,6 @@ export const subscriptionTiers = {
     canAccessAnalytics: true,
     canCustomizeBanner: true,
     canRemoveBranding: true,
-
   },
   Premium: {
     name: "Premium",
@@ -42,16 +39,15 @@ export const subscriptionTiers = {
     canAccessAnalytics: true,
     canCustomizeBanner: true,
     canRemoveBranding: true,
-
   },
-} as const
+} as const;
 
 export const subscriptionTiersInOrder = [
   subscriptionTiers.Free,
   subscriptionTiers.Basic,
   subscriptionTiers.Standard,
   subscriptionTiers.Premium,
-] as const
+] as const;
 
 // export function getTierByPriceId(stripePriceId: string) {
 //   return Object.values(subscriptionTiers).find(

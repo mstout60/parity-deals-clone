@@ -10,10 +10,10 @@ export default function NewProductPage() {
     >
       <Card>
         <CardHeader>
-            <CardTitle className="text-xl">Product Details</CardTitle>
+          <CardTitle className="text-xl">Product Details</CardTitle>
         </CardHeader>
         <CardContent>
-         <ProductDetailsForm />   
+          <ProductDetailsForm />
         </CardContent>
       </Card>
     </PageWithBackButton>

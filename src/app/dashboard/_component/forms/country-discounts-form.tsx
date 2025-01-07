@@ -16,6 +16,8 @@ import { z } from "zod";
 import ReactCountryFlag from "react-country-flag";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { updateCountryDiscounts } from "@/server/actions/products";
 
 export function CountryDiscountsForm({
   productId,
@@ -36,6 +38,7 @@ export function CountryDiscountsForm({
     };
   }[];
 }) {
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof productCountryDiscountsSchema>>({
     resolver: zodResolver(productCountryDiscountsSchema),
     defaultValues: {
@@ -53,8 +56,18 @@ export function CountryDiscountsForm({
     },
   });
 
-  function onSubmit(values: z.infer<typeof productCountryDiscountsSchema>) {
-    console.log(values);
+  async function onSubmit(
+    values: z.infer<typeof productCountryDiscountsSchema>
+  ) {
+    const data = await updateCountryDiscounts(productId, values);
+
+    if (data.message) {
+      toast({
+        title: data.error ? "Error" : "Success",
+        description: data.message,
+        variant: data.error ? "destructive" : "default",
+      });
+    }
   }
 
   return (

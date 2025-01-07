@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { productDetailsSchema } from "@/app/schemas/products";
 import { createProduct, updateProduct } from "@/server/actions/products";
 import { useToast } from "@/hooks/use-toast";
+import { RequiredLabelIcon } from "@/components/required-label-icon";
 
 export function ProductDetailsForm({
   product,
@@ -68,6 +69,7 @@ export function ProductDetailsForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Product Name</FormLabel>
+              <RequiredLabelIcon />
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -81,6 +83,7 @@ export function ProductDetailsForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Enter your website URL</FormLabel>
+              <RequiredLabelIcon />
               <FormControl>
                 <Input {...field} />
               </FormControl>

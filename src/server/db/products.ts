@@ -14,6 +14,7 @@ import {
 } from "@/lib/cache";
 import { and, count, eq, inArray, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
+import { removeTrailingSlash } from "@/lib/utils";
 
 export function getProductCountryGroups({
   productId,
@@ -47,7 +48,10 @@ export function getProductCustomization({
   return cacheFn({ productId, userId });
 }
 
-export function getProducts(userId: string, { limit }: { limit?: number } = {}) {
+export function getProducts(
+  userId: string,
+  { limit }: { limit?: number } = {}
+) {
   const cacheFn = dbCache(getProductsInternal, {
     tags: [getUserTag(userId, CACHE_TAGS.products)],
   });
@@ -217,6 +221,26 @@ export async function updateProductCustomization(
   });
 }
 
+export async function getProductForBanner({
+  id,
+  countryCode,
+  url,
+}: {
+  id: string;
+  countryCode: string;
+  url: string;
+}) {
+  const cacheFn = dbCache(getProductForBannerInernal, {
+    tags: [
+      getIdTag(id, CACHE_TAGS.products),
+      getGlobalTag(CACHE_TAGS.countries),
+      getGlobalTag(CACHE_TAGS.countryGroups),
+    ],
+  });
+
+  return cacheFn({ id, countryCode, url });
+}
+
 async function getProductCountryGroupsInternal({
   userId,
   productId,
@@ -297,4 +321,73 @@ async function getProductCountInternal(userId: string) {
     .where(eq(ProductTable.clerkUserId, userId));
 
   return counts[0]?.productCount ?? 0;
+}
+
+async function getProductForBannerInernal({
+  id,
+  countryCode,
+  url,
+}: {
+  id: string;
+  countryCode: string;
+  url: string;
+}) {
+  const data = await db.query.ProductTable.findFirst({
+    where: ({ id: idCol, url: urlCol }, { eq, and }) =>
+      and(eq(idCol, id), eq(urlCol, removeTrailingSlash(url))),
+    columns: {
+      id: true,
+      clerkUserId: true,
+    },
+    with: {
+      productCustization: true,
+      countryGroupDiscounts: {
+        columns: {
+          coupon: true,
+          discountPercentage: true,
+        },
+        with: {
+          countryGroup: {
+            columns: {},
+            with: {
+              countries: {
+                columns: {
+                  id: true,
+                  name: true,
+                },
+                limit: 1,
+                where: ({ code }, { eq }) => eq(code, countryCode),
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const discount = data?.countryGroupDiscounts.find(
+    (discount) => discount.countryGroup.countries.length > 0
+  );
+
+  const country = discount?.countryGroup.countries[0];
+  const product =
+    data == null || data.productCustization == null
+      ? undefined
+      : {
+          id: data.id,
+          clerkUserId: data.clerkUserId,
+          customization: data.productCustization,
+        };
+
+  return {
+    product,
+    country,
+    discount:
+      discount == null
+        ? undefined
+        : {
+            coupon: discount.coupon,
+            percentage: discount.discountPercentage,
+          },
+  };
 }

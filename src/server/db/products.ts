@@ -12,9 +12,10 @@ import {
   getUserTag,
   revalidateDbCache,
 } from "@/lib/cache";
+import { removeTrailingSlash } from "@/lib/utils";
 import { and, count, eq, inArray, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
-import { removeTrailingSlash } from "@/lib/utils";
+
 
 export function getProductCountryGroups({
   productId,
@@ -230,7 +231,7 @@ export async function getProductForBanner({
   countryCode: string;
   url: string;
 }) {
-  const cacheFn = dbCache(getProductForBannerInernal, {
+  const cacheFn = dbCache(getProductForBannerInternal, {
     tags: [
       getIdTag(id, CACHE_TAGS.products),
       getGlobalTag(CACHE_TAGS.countries),
@@ -323,7 +324,7 @@ async function getProductCountInternal(userId: string) {
   return counts[0]?.productCount ?? 0;
 }
 
-async function getProductForBannerInernal({
+async function getProductForBannerInternal({
   id,
   countryCode,
   url,

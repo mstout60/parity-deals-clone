@@ -78,20 +78,20 @@ async function getJavaScript(
 ) {
   const { renderToStaticMarkup } = await import("react-dom/server");
   return `
-        const banner = document.createElement("div");
-        banner.innerHTML = '${renderToStaticMarkup(
-          createElement(Banner, {
-            message: product.customization.locationMessage,
-            mappings: {
-              country: country.name,
-              coupon: discount.coupon,
-              discount: (discount.percentage * 100).toString(),
-            },
-            customization: product.customization,
-            canRemoveBranding,
-          })
-        )}';
-        document.querySelectory("${
+    const banner = document.createElement("div");
+    banner.innerHTML = '${renderToStaticMarkup(
+      createElement(Banner, {
+        message: product.customization.locationMessage,
+        mappings: {
+          country: country.name,
+          coupon: discount.coupon,
+          discount: (discount.percentage * 100).toString(),
+        },
+        customization: product.customization,
+        canRemoveBranding,
+      })
+    )}';
+        document.querySelector("${
           product.customization.bannerContainer
         }").prepend(...banner.children)
     `.replace(/(\r\n|\n|\r)/g, "");
